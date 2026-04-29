@@ -1,10 +1,10 @@
-# Job Application Tracker
+# Job Application Tracker 👩🏻‍💻
 
 A full-stack job application tracker built to help me organize my own job search while practicing the skills I want to strengthen as I prepare for software development roles.
 
 ## Why I Am Building This
 
-I am currently preparing to enter the job market search in the software development field, and I wanted to build something that solves a real problem in my own life: keeping track of job applications, interview stages, follow-ups, resume versions, and notes in one organized place.
+As I am currently preparing to enter the job market search in the software development field, I wanted to build something that solves a real problem in my own life: keeping track of job applications, interview stages, follow-ups, resume versions, and notes in one organized place.
 
 Instead of building a generic CRUD app, I chose this project because it connects directly to my current career goals. It gives me the opportunity to practice full-stack development while creating something I can actually use during my job search.
 
@@ -65,7 +65,7 @@ Possible application statuses:
 
 This project is currently in the initial setup phase.
 
-## What I Want to Practice
+## What I Want to Practice 🎯
 
 - Building a full-stack app from scratch
 - Designing a relational database schema
