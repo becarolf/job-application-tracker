@@ -23,11 +23,14 @@ Example response:
 
 This is the main route for job application data.
 
-So far, I created two versions of this route:
+So far, I created these routes:
 
 ```txt
 GET /api/applications
 POST /api/applications
+GET /api/applications/:id
+PATCH /api/applications/:id
+DELETE /api/applications/:id
 ```
 
 ## GET /api/applications
@@ -101,10 +104,70 @@ Example response:
 }
 ```
 
+## GET /api/applications/:id
+
+This route returns one job application by its ID.
+
+Example:
+
+```txt
+GET /api/applications/1
+```
+
+If the application exists, it returns that application.
+
+If the ID does not exist, it returns an error message.
+
+## PATCH /api/applications/:id
+
+This route updates part of a job application.
+
+Example:
+
+```txt
+PATCH /api/applications/1
+```
+
+For now, I can update fields like:
+
+```txt
+company
+jobTitle
+jobUrl
+location
+status
+dateApplied
+```
+
+Example request body:
+
+```json
+{
+  "status": "Technical Interview"
+}
+```
+
+This only updates the status and keeps the other fields the same.
+
+## DELETE /api/applications/:id
+
+This route deletes one job application by its ID.
+
+Example:
+
+```txt
+DELETE /api/applications/1
+```
+
+If the application exists, it removes it from the array.
+
+If the ID does not exist, it returns an error message.
+
 ## Notes
 
-The current API is only the first version. 
-The data is not saved permanently. If I stop and restart the server, any new applications created with `POST /api/applications` will disappear.
+The current API is only the first version.
+
+The data is not saved permanently. If I stop and restart the server, any new applications created, updated, or deleted will reset because the data is only stored in memory.
 
 At this stage, the goal is to understand how backend routes work before adding a real database.
 
@@ -123,6 +186,6 @@ Later improvements:
 Connect routes to PostgreSQL
 Add better validation
 Add error handling
-Add update and delete routes
 Add authentication
+Refactor the backend into routes, controllers, and services
 ```
