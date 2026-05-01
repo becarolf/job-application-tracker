@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import {
-  createApplication, 
+  createApplication,
   deleteApplication,
   getAllApplications,
   getApplicationById,
@@ -18,11 +18,19 @@ function getAllApplicationIdFromRequest(req: Request): number | null {
   return applicationId;
 }
 
-export function getApplications(_req: Request, res: Response): void {
-  res.json(getAllApplications());
+export async function getApplications(
+  _req: Request,
+  res: Response
+): Promise<void> {
+  const applications = await getAllApplications();
+
+  res.json(applications);
 }
 
-export function getApplication(req: Request, res: Response): void {
+export async function getApplication(
+  req: Request,
+  res: Response
+): Promise<void> {
   const applicationId = getAllApplicationIdFromRequest(req);
 
   if (applicationId === null) {
@@ -32,7 +40,7 @@ export function getApplication(req: Request, res: Response): void {
     return;
   }
 
-  const application = getApplicationById(applicationId);
+  const application = await getApplicationById(applicationId);
 
   if (!application) {
     res.status(404).json({
@@ -44,7 +52,10 @@ export function getApplication(req: Request, res: Response): void {
   res.json(application);
 }
 
-export function addApplication(req: Request, res: Response): void {
+export async function addApplication(
+  req: Request,
+  res: Response
+): Promise<void> {
   const { company, jobTitle, jobUrl, location, status, dateApplied } = req.body;
 
   if (!company || !jobTitle) {
@@ -54,7 +65,7 @@ export function addApplication(req: Request, res: Response): void {
     return;
   }
 
-  const newApplication = createApplication({
+  const newApplication = await createApplication({
     company,
     jobTitle,
     jobUrl,
@@ -66,7 +77,10 @@ export function addApplication(req: Request, res: Response): void {
   res.status(201).json(newApplication);
 }
 
-export function editApplication(req: Request, res: Response): void {
+export async function editApplication(
+  req: Request,
+  res: Response
+): Promise<void> {
   const applicationId = getAllApplicationIdFromRequest(req);
 
   if (applicationId === null) {
@@ -76,19 +90,22 @@ export function editApplication(req: Request, res: Response): void {
     return;
   }
 
-  const updatedApplication = updateApplication(applicationId, req.body);
+  const updatedApplication = await updateApplication(applicationId, req.body);
 
-  if (!updateApplication) {
+  if (!updatedApplication) {
     res.status(404).json({
       error: "Job application not found.",
     });
     return;
   }
 
-  res.json(updatedApplication)
+  res.json(updatedApplication);
 }
 
-export function removeApplication(req: Request, res: Response): void {
+export async function removeApplication(
+  req: Request,
+  res: Response
+): Promise<void> {
   const applicationId = getAllApplicationIdFromRequest(req);
 
   if (applicationId === null) {
@@ -98,9 +115,9 @@ export function removeApplication(req: Request, res: Response): void {
     return;
   }
 
-  const wasDeleted = deleteApplication(applicationId);
+  const wasDeleted = await deleteApplication(applicationId);
 
-  if (!wasDeleted){
+  if (!wasDeleted) {
     res.status(404).json({
       error: "Job application not found.",
     });

@@ -1,75 +1,79 @@
-import { appendFile } from "node:fs";
-import { jobApplications } from "../data/applications.mock.js";
+import { prisma } from "../lib/prisma.js";
 import type {
   CreateJobApplicationInput,
-  JobApplication,
   UpdateJobApplicationInput,
-} from "../types/application.types.js"
-import { application } from "express";
+} from "../types/application.types.js";
 
-export function getAllApplications(): JobApplication[] {
-  return jobApplications;
+export async function getAllApplications() {
+  // get all applications from the database
+  return prisma.jobApplication.findMany({
+    orderBy: {
+      id: "asc",
+    },
+  });
 }
 
-export function getApplicationById(id: number): JobApplication | undefined {
-  return jobApplications.find((application) => application.id === id);
+export async function getApplicationById(id: number) {
+  return prisma.jobApplication.findUnique({
+    where: {
+      id,
+    },
+  });
 }
 
-export function createApplication(
-  input: CreateJobApplicationInput
-): JobApplication {
-  const nextId = 
-    jobApplications.length === 0 
-      ? 1
-      : Math.max(...jobApplications.map((application) => application.id)) + 1;
-  
-  const newApplication: JobApplication = {
-    id: nextId,
-    company: input.company,
-    jobTitle: input.jobTitle,
-    jobUrl: input.jobUrl || "",
-    location: input.location || "",
-    status: input.status || "Saved",
-    dateApplied: input.dateApplied || new Date().toISOString().split("T")[0],
-  };
-
-  jobApplications.push(newApplication);
-
-  return newApplication;
+export async function createApplication(input: CreateJobApplicationInput) {
+  // insert a new row into the JobApplication table
+  return prisma.jobApplication.create({
+    data: {
+      company: input.company,
+      jobTitle: input.jobTitle,
+      jobUrl: input.jobUrl || null,
+      location: input.location || null,
+      status: input.status || "Saved",
+      dateApplied: input.dateApplied ? new Date(input.dateApplied) : null,
+    },
+  });
 }
 
-export function updateApplication(
+export async function updateApplication(
   id: number,
   input: UpdateJobApplicationInput
-): JobApplication | undefined {
-  const application = getApplicationById(id);
+) {
+  const existingApplication = await getApplicationById(id);
 
-  if (!application) {
+  if (!existingApplication) {
     return undefined;
   }
 
-  if (input.company !== undefined) application.company = input.company;
-  if (input.jobTitle !== undefined) application.jobTitle = input.jobTitle;
-  if (input.jobUrl !== undefined) application.jobUrl = input.jobUrl;
-  if (input.location !== undefined) application.location = input.location;
-  if (input.status !== undefined) application.status = input.status;
-  if (input.dateApplied !== undefined) {
-    application.dateApplied = input.dateApplied;
-  }
-
-  return application
+  return prisma.jobApplication.update({
+    where: {
+      id,
+    },
+    data: {
+      ...(input.company !== undefined && { company: input.company }),
+      ...(input.jobTitle !== undefined && { jobTitle: input.jobTitle }),
+      ...(input.jobUrl !== undefined && { jobUrl: input.jobUrl }),
+      ...(input.location !== undefined && { location: input.location }),
+      ...(input.status !== undefined && { status: input.status }),
+      ...(input.dateApplied !== undefined && {
+        dateApplied: input.dateApplied ? new Date(input.dateApplied) : null,
+      }),
+    },
+  });
 }
 
-export function deleteApplication(id: number): boolean {
-  const applicationIndex = jobApplications.findIndex(
-    (application) => application.id === id
-  );
+export async function deleteApplication(id: number): Promise<boolean> {
+  const existingApplication = await getApplicationById(id);
 
-  if (applicationIndex === -1) {
+  if (!existingApplication) {
     return false;
   }
 
-  jobApplications.splice(applicationIndex, 1);
+  await prisma.jobApplication.delete({
+    where: {
+      id,
+    },
+  });
 
   return true;
 }
