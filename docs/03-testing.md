@@ -39,14 +39,16 @@ I am also testing some basic error cases:
 
 ## Test Data
 
-The backend is still using temporary data stored in an array.
+The backend is now connected to PostgreSQL.
 
-Since the tests can create, update, or delete applications, I reset the array before each test. This way, each test starts with the same sample data and does not affect the next one.
+Before each test, the `JobApplication` table is cleared and fresh sample data is inserted again.
+
+This way, each test starts with the same data and does not affect the next one.
 
 ## Why I Added Tests Now
 
 I added tests after building and refactoring the basic CRUD API.
 
-This felt like the right time because the routes are working, but the app is still simple enough to test.
+This felt like the right time because the routes were already working, and I wanted a safety net before and after connecting the API to PostgreSQL.
 
-The goal is to have a safety net before replacing the temporary array with a real PostgreSQL database.
+The tests help me make sure the API still works when I change the internal implementation.

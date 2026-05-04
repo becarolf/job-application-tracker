@@ -1,8 +1,9 @@
 # API Routes
 
-These are the first backend routes for the Job Application Tracker.
+These are the current backend routes for the Job Application Tracker.
 
-Right now, the data is temporary and is stored in an array inside the backend code. Later, I will connect these routes to a PostgreSQL database.
+At first, the API used temporary data stored in an array. Now, the routes are connected to PostgreSQL using Prisma, so the job applications are saved in the database.
+
 
 ## GET /health
 
@@ -45,12 +46,17 @@ Example response:
 [
   {
     "id": 1,
-    "company": "Shopify",
-    "jobTitle": "Junior Software Developer",
-    "jobUrl": "https://example.com/shopify-job",
+    "company": "Google",
+    "jobTitle": "Software Developer Intern",
+    "jobUrl": "https://example.com/google-job",
     "location": "Toronto, ON",
-    "status": "Applied",
-    "dateApplied": "2026-04-29"
+    "salaryMin": null,
+    "salaryMax": null,
+    "status": "Saved",
+    "dateApplied": "2026-04-29T00:00:00.000Z",
+    "notes": null,
+    "createdAt": "2026-05-01T21:17:28.379Z",
+    "updatedAt": "2026-05-01T21:17:28.379Z"
   }
 ]
 ```
@@ -73,8 +79,11 @@ Optional fields:
 ```txt
 jobUrl
 location
+salaryMin
+salaryMax
 status
 dateApplied
+notes
 ```
 
 Example request body:
@@ -94,13 +103,18 @@ Example response:
 
 ```json
 {
-  "id": 3,
+  "id": 1,
   "company": "Google",
   "jobTitle": "Software Developer Intern",
   "jobUrl": "https://example.com/google-job",
   "location": "Toronto, ON",
+  "salaryMin": null,
+  "salaryMax": null,
   "status": "Saved",
-  "dateApplied": "2026-04-29"
+  "dateApplied": "2026-04-29T00:00:00.000Z",
+  "notes": null,
+  "createdAt": "2026-05-01T21:17:28.379Z",
+  "updatedAt": "2026-05-01T21:17:28.379Z"
 }
 ```
 
@@ -135,8 +149,11 @@ company
 jobTitle
 jobUrl
 location
+salaryMin
+salaryMax
 status
 dateApplied
+notes
 ```
 
 Example request body:
@@ -165,11 +182,9 @@ If the ID does not exist, it returns an error message.
 
 ## Notes
 
-The current API is only the first version.
+The API is now connected to PostgreSQL.
 
-The data is not saved permanently. If I stop and restart the server, any new applications created, updated, or deleted will reset because the data is only stored in memory.
-
-At this stage, the goal is to understand how backend routes work before adding a real database.
+The backend uses Prisma to create, read, update, and delete job applications.
 
 Current flow:
 
@@ -177,15 +192,18 @@ Current flow:
 Client sends request
 Backend receives request
 Express matches the route
+Controller handles the request and response
+Service handles the application logic
+Prisma talks to PostgreSQL
 Backend sends JSON response
 ```
 
 Later improvements:
 
 ```txt
-Connect routes to PostgreSQL
 Add better validation
-Add error handling
+Add error handling middleware
 Add authentication
-Refactor the backend into routes, controllers, and services
+Add users
+Add tags, reminders, contacts, and documents
 ```
