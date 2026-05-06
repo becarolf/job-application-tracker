@@ -98,6 +98,23 @@ describe("Applications API", () => {
     expect(listResponse.body).toHaveLength(3);
   });
 
+  it("saves salary and notes when creating a job application", async () => {
+    const response = await request(app)
+      .post("/api/applications")
+      .send({
+        company: "Amazon",
+        jobTitle: "Junior Backend Developer",
+        salaryMin: 70000,
+        salaryMax: 90000,
+        notes: "Found on company careers page.",
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.salaryMin).toBe(70000);
+    expect(response.body.salaryMax).toBe(90000);
+    expect(response.body.notes).toBe("Found on company careers page.");
+  });
+
   it("returns 400 when creating an application without required fields", async () => {
     const response = await request(app)
       .post("/api/applications")
@@ -107,8 +124,36 @@ describe("Applications API", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: "Company and job title are required.",
+      errors: ["Company is required.", "Job title is required."],
     });
+  });
+
+  it("returns 400 when creating an application with an invalid salary range", async () => {
+    const response = await request(app)
+      .post("/api/applications")
+      .send({
+        company: "Google",
+        jobTitle: "Software Developer Intern",
+        salaryMin: 90000,
+        salaryMax: 60000,
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      errors: ["Salary max must be greater than or equal to salary min."],
+    });
+  });
+
+  it("returns 400 when creating an application with an invalid status", async () => {
+    const response = await request(app)
+      .post("/api/applications")
+      .send({
+        company: "Google",
+        jobTitle: "Software Developer Intern",
+        status: "Random Status",
+      });
+
+    expect(response.status).toBe(400);
   });
 
   it("updates part of a job application", async () => {
@@ -122,6 +167,17 @@ describe("Applications API", () => {
     expect(response.body.id).toBe(shopifyId);
     expect(response.body.status).toBe("Technical Interview");
     expect(response.body.company).toBe("Shopify");
+  });
+
+  it("returns 400 when updating with an empty body", async () => {
+    const response = await request(app)
+      .patch(`/api/applications/${shopifyId}`)
+      .send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      errors: ["At least one field is required for update."],
+    });
   });
 
   it("deletes a job application", async () => {

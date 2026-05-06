@@ -13,8 +13,11 @@ export type CreateJobApplicationInput = {
   jobTitle: string;
   jobUrl?: string;
   location?: string;
+  salaryMin?: number;
+  salaryMax?: number;
   status?: string;
   dateApplied?: string;
+  notes?: string;
 };
 
 export type UpdateJobApplicationInput = Partial<CreateJobApplicationInput>;

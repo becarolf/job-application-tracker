@@ -6,6 +6,7 @@ import {
   getApplicationById,
   updateApplication,
 } from "../services/applications.service.js";
+import { createApplicationSchema, updateApplicationSchema } from "../schemas/application.schema.js";  
 
 function getAllApplicationIdFromRequest(req: Request): number | null {
   // req.params.id comes from the URL as a string, so I convert it to a number.
@@ -16,6 +17,10 @@ function getAllApplicationIdFromRequest(req: Request): number | null {
   }
 
   return applicationId;
+}
+
+function formatValidationErrors(issues: { message: string }[]): string[] {
+  return issues.map((issue) => issue.message);
 }
 
 export async function getApplications(
@@ -56,23 +61,16 @@ export async function addApplication(
   req: Request,
   res: Response
 ): Promise<void> {
-  const { company, jobTitle, jobUrl, location, status, dateApplied } = req.body;
+  const result = createApplicationSchema.safeParse(req.body);
 
-  if (!company || !jobTitle) {
+  if (!result.success) {
     res.status(400).json({
-      error: "Company and job title are required.",
+      errors: formatValidationErrors(result.error.issues),
     });
     return;
   }
 
-  const newApplication = await createApplication({
-    company,
-    jobTitle,
-    jobUrl,
-    location,
-    status,
-    dateApplied,
-  });
+  const newApplication = await createApplication(result.data)
 
   res.status(201).json(newApplication);
 }
@@ -90,7 +88,16 @@ export async function editApplication(
     return;
   }
 
-  const updatedApplication = await updateApplication(applicationId, req.body);
+  const result = updateApplicationSchema.safeParse(req.body);
+
+  if (!result.success) {
+    res.status(400).json({
+      errors: formatValidationErrors(result.error.issues),
+    });
+    return;
+  }
+
+  const updatedApplication = await updateApplication(applicationId, result.data);
 
   if (!updatedApplication) {
     res.status(404).json({

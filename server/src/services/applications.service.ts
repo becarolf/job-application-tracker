@@ -29,8 +29,11 @@ export async function createApplication(input: CreateJobApplicationInput) {
       jobTitle: input.jobTitle,
       jobUrl: input.jobUrl || null,
       location: input.location || null,
+      salaryMin: input.salaryMin ?? null,
+      salaryMax: input.salaryMax ?? null,
       status: input.status || "Saved",
       dateApplied: input.dateApplied ? new Date(input.dateApplied) : null,
+      notes: input.notes || null,
     },
   });
 }
@@ -58,6 +61,9 @@ export async function updateApplication(
       ...(input.dateApplied !== undefined && {
         dateApplied: input.dateApplied ? new Date(input.dateApplied) : null,
       }),
+      ...(input.salaryMin !== undefined && { salaryMin: input.salaryMin }),
+      ...(input.salaryMax !== undefined && { salaryMax: input.salaryMax }),
+      ...(input.notes !== undefined && { notes: input.notes }),
     },
   });
 }
