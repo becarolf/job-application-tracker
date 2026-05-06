@@ -34,6 +34,55 @@ PATCH /api/applications/:id
 DELETE /api/applications/:id
 ```
 
+## Request Validation
+
+
+The API validates request bodies before creating or updating job applications.
+
+I am using Zod for validation.
+
+For `POST /api/applications`, the required fields are:
+
+```txt
+company
+jobTitle
+```
+
+Some validation rules right now:
+
+```txt
+company cannot be empty
+jobTitle cannot be empty
+jobUrl must be a valid URL if provided
+dateApplied must use YYYY-MM-DD format if provided
+salaryMin and salaryMax must be positive numbers if provided
+salaryMax must be greater than or equal to salaryMin
+status must be one of the allowed status values
+```
+
+Current allowed status values:
+
+```txt
+Saved
+Applied
+Recruiter Screen
+Technical Interview
+Final Interview
+Offer
+Rejected
+Withdrawn
+```
+
+Validation errors return a `400` response.
+
+Example validation error:
+
+```json
+{
+  "errors": ["Company is required.", "Job title is required."]
+}
+```
+
 ## GET /api/applications
 
 This route returns the list of job applications.
@@ -136,6 +185,10 @@ If the ID does not exist, it returns an error message.
 
 This route updates part of a job application.
 
+The request body is validated with Zod before the update happens.
+
+For `PATCH`, all fields are optional, but the request body cannot be empty.
+
 Example:
 
 ```txt
@@ -166,6 +219,14 @@ Example request body:
 
 This only updates the status and keeps the other fields the same.
 
+If the request body is empty, the API returns:
+
+```json
+{
+  "errors": ["At least one field is required for update."]
+}
+```
+
 ## DELETE /api/applications/:id
 
 This route deletes one job application by its ID.
@@ -192,6 +253,7 @@ Current flow:
 Client sends request
 Backend receives request
 Express matches the route
+Controller validates the request body with Zod
 Controller handles the request and response
 Service handles the application logic
 Prisma talks to PostgreSQL
@@ -201,7 +263,6 @@ Backend sends JSON response
 Later improvements:
 
 ```txt
-Add better validation
 Add error handling middleware
 Add authentication
 Add users
