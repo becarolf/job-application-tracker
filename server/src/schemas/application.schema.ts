@@ -45,13 +45,13 @@ export const createApplicationSchema = applicationBaseSchema.refine(
   isValidSalaryRange,
   {
     message: "Salary max must be greater than or equal to salary min.",
-    // Here I tell Zod to attach the error to the salaryMax field.
+    // here I tell Zod to attach the error to the salaryMax field.
     path: ["salaryMax"],
   }
 );
 
 // PATCH: all fields are optional, but the user cannot send an empty body.
-// An empty body would mean there is nothing to update.
+// an empty body would mean there is nothing to update.
 export const updateApplicationSchema = applicationBaseSchema
   .partial()
   .refine((data) => Object.keys(data).length > 0, {
